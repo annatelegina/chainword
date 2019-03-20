@@ -4,5 +4,5 @@ import MyProj
 
 main :: IO ()
 main = do
-  putStrLn "Hello World!"
-  runMyProj
+    putStrLn "Hello World!"
+    runMyProj
