@@ -1,14 +1,24 @@
 module MyProj
     ( runMyProj
     ) where
+
 import Graphics.Gloss
 import Prelude
 sizeWin = 560 :: Int
 centPos  = 100 :: Int
 
-
---data Maybe a = Nothing | Just a
+data Letter = Letter
+    { symb :: Char
+    , border :: Bool
+    }
 data Action = Insert | Delete
+data GameState = Error | Ok 
+
+data World = World
+    { field :: [Maybe Char]
+    , answers :: [Letter]
+  --  , States :: GameState
+    }
 
 cellDim =  8 :: Int
 cellSize :: Int
@@ -18,7 +28,6 @@ heiOffset = 100 :: Int
 
 --functions for the chain of char symbols
 ----last elem of the list
-
 lastList :: [a] -> a
 lastList [x] = x
 lastList (x:xs) = lastList xs
@@ -32,15 +41,19 @@ isCorrect (x:xs) = lastOne == firstTwo && isCorrect xs
         lastOne = lastList x
         firstTwo = head (head xs)
 
---deleting the last letter in the word
-delLast :: [a] -> [a]
-delLast [x] = []
-delLast (x:xs) = x:delLast xs
+--doing the chain of chars for chainword
+concatList :: [String] -> [Letter]
+concatList [x] = makeChain x
+concatList (x:xs) =  makeChain x ++ (tail $ concatList xs)
 
---doing the chein of chars for chainword
-concatList :: [String] -> [Char]
-concatList [x] = x
-concatList (x:xs) =  delLast x ++ concatList xs
+makeChain :: [Char] -> [Letter]
+makeChain [x] = [Letter x False]
+makeChain (x:xs) = (Letter x False) : makeChain xs
+
+--util for printing letters
+showLetter :: [Letter] -> String
+showLetter [] =  "done."
+showLetter (x:xs) = "symbol is :" ++ (show (symb x)) ++ ", bool is: "++ (show (border x)) ++ "\n" ++ showLetter xs
 
 --action for insert/delete symbols in the chain
 smthLetter :: Action -> Int -> Int -> String -> [Maybe Char] -> [Maybe Char]
@@ -61,12 +74,13 @@ checkRight [] _ = 0
 checkRight (x:xs) (Nothing : ys) = checkRight xs ys
 checkRight (x:xs) (y:ys) = if x ==  (fromJust y) then (1 + checkRight xs ys)  else checkRight xs ys
 
---initialize the chain
+--initialize the chain--------------------------------------------------------
 makeN :: Int -> a -> [a]
 makeN 0 _ = []
 makeN n x = x : makeN (n-1) x
 
---some functions for rendering
+-----some functions for rendering---------------------------------------------
+------------------------------------------------------------------------------
 window :: Display
 window = InWindow "Chainword" (sizeWin, sizeWin+heiOffset) (centPos, centPos)
 
@@ -110,14 +124,14 @@ drawing = pictures
 -----------------------------------------------
 
 
-testList = ["anna", "apple", "elephant", "table"] :: [String]
+testList = ["anna", "apple", "enabl", "look"] :: [String]
 
 
 runMyProj :: IO ()
 runMyProj = do
-        --  putStrLn (show $ concatList testList)
-       -- putStrLn (show cellSize) 
-        display window background ((makeVertical cellDim )<> (makeHorizontal cellDim) <> chainLines)
+       --   putStrLn (showLetter $ concatList testList)
+          putStrLn( showLetter $ concatList testList)
+      --  display window background ((makeVertical cellDim )<> (makeHorizontal cellDim) <> chainLines)
         
         
         
