@@ -17,14 +17,52 @@ data GameState = Error | Ok
 data World = World
     { field :: [Maybe Char]
     , answers :: [Letter]
-  --  , States :: GameState
+    , marker :: Int
+    , colour_marker :: Color
+    , colour_letter :: Color
     }
-
+tmpField = [ (a, 1)| a <-[8,7..1]] ++ [(b, 2) |b <-[1,2..8]] ++ [ (a, 3)| a <-[8,7..1]] 
+           ++ [(b, 4) |b <-[1,2..8]] ++ [ (a, 5)| a <-[8,7..1]] ++ [(b, 6) |b <-[1,2..8]] 
+           ++ [ (a, 7)| a <-[8,7..1]] ++ [(b, 8) |b <-[1,2..8]]
+           
 cellDim =  8 :: Int
 cellSize :: Int
 cellSize = div sizeWin cellDim
 heiOffset = 100 :: Int
 
+
+getCell :: Int -> (Int, Int)
+getCell n = tmpField!!(n-1)
+
+getCorner :: (Int, Int) -> (Float, Float)
+getCorner (x, y) = (fst s+10, snd s-2*l-10)
+                   where s = position (x-1, y-1)
+                         l = fromIntegral(div cellSize 2)
+
+getCenter :: (Int, Int) -> (Float, Float)
+getCenter (x, y) = (fst s+l, snd s-l)
+                   where s = position (x-1, y-1)
+                         l = fromIntegral(div cellSize 2)
+
+position :: (Int, Int) -> (Float, Float)
+position (x, y) = (fromIntegral(- div sizeWin 2 + y*cellSize), fromIntegral(div (sizeWin+heiOffset) 2 - x*cellSize))
+
+makeWorld :: [String] -> World
+makeWorld x = World (replicate (cellDim*cellDim) (Just 'A') ) (concatList x) 1 green black
+
+drawMarker:: Int -> Picture
+drawMarker n = translate (fst cord) (snd cord) $ color green $ rectangleSolid size size
+               where 
+                     size = fromIntegral cellSize
+                     cord = getCenter (getCell n) 
+	   
+drawWorld :: World -> Picture
+drawWorld (World x y num colour lett) = (base<>marker<>words<>numbers)
+                                where
+                                     base = (makeVertical cellDim) <> (makeHorizontal cellDim) <> chainLines
+                                     marker = drawMarker num
+                                     words = mconcat [color lett $ translate (fst $ getCenter (getCell n)) (snd $ getCenter (getCell n)) $ scale 0.2 0.2 $ Text $ show ch | n<- [1..length x], Just ch <- [x!!(n-1)]]
+                                     
 
 --functions for the chain of char symbols
 ----last elem of the list
@@ -47,13 +85,18 @@ concatList [x] = makeChain x
 concatList (x:xs) =  makeChain x ++ (tail $ concatList xs)
 
 makeChain :: [Char] -> [Letter]
-makeChain [x] = [Letter x False]
-makeChain (x:xs) = (Letter x False) : makeChain xs
+makeChain  [x] = [Letter x True]
+makeChain  (x:xs) = (Letter x False) : makeChain xs
 
 --util for printing letters
 showLetter :: [Letter] -> String
 showLetter [] =  "done."
 showLetter (x:xs) = "symbol is :" ++ (show (symb x)) ++ ", bool is: "++ (show (border x)) ++ "\n" ++ showLetter xs
+
+showLst :: [Maybe Char] -> String
+showLst [] = "The end."
+showLst (Just x : xs) = "Char" ++(show x) ++ "\n" ++ showLst xs
+showLst (Nothing : xs) = "Nothing" ++ "\n"++ showLst xs
 
 --action for insert/delete symbols in the chain
 smthLetter :: Action -> Int -> Int -> String -> [Maybe Char] -> [Maybe Char]
@@ -75,9 +118,9 @@ checkRight (x:xs) (Nothing : ys) = checkRight xs ys
 checkRight (x:xs) (y:ys) = if x ==  (fromJust y) then (1 + checkRight xs ys)  else checkRight xs ys
 
 --initialize the chain--------------------------------------------------------
-makeN :: Int -> a -> [a]
-makeN 0 _ = []
-makeN n x = x : makeN (n-1) x
+initList :: Int -> a -> [a]
+initList 0 _ = []
+initList n x = x : initList (n-1) x
 
 -----some functions for rendering---------------------------------------------
 ------------------------------------------------------------------------------
@@ -105,22 +148,23 @@ chainLines = mconcat [color (dark black) (line [(lineCoord n, lineCoordh 0), (li
 
 --returns the coordinate of the line            
 lineCoord :: Int -> Float
-lineCoord n = fromIntegral( - div sizeWin 2 + n * cellSize)
+lineCoord n = fromIntegral(div sizeWin 2 - n * cellSize)
 
 lineCoordh :: Int -> Float
-lineCoordh n = fromIntegral( - div (sizeWin - heiOffset) 2 + n * cellSize)
+lineCoordh n = fromIntegral(-div (sizeWin - heiOffset) 2 + n * cellSize)
+
 
 
 --something help, not need now
 -----------------------------------------------
 drawing :: Picture
 drawing = pictures
-  [ translate (-20) (-100) $ color ballColor $ circleSolid 30 
-  , translate 30 50 $ color paddleColor $ rectangleSolid 10 50
+  [ translate (fst s) (snd s)  $ color ballColor $ circleSolid 10 
+--  , translate 30 50 $ color paddleColor $ rectangleSolid 10 50
   ]
   where
+    s = getCenter (getCell 1)
     ballColor = dark red
-    paddleColor = light (light blue)
 -----------------------------------------------
 
 
@@ -129,9 +173,20 @@ testList = ["anna", "apple", "enabl", "look"] :: [String]
 
 runMyProj :: IO ()
 runMyProj = do
-       --   putStrLn (showLetter $ concatList testList)
-          putStrLn( showLetter $ concatList testList)
-      --  display window background ((makeVertical cellDim )<> (makeHorizontal cellDim) <> chainLines)
+           -- putStrLn ("Correct answer list is:")
+           -- putStrLn( showLetter $ s)
+           -- putStrLn ("Our answer list is :")
+           -- putStrLn (showLst $ a)
+           -- putStrLn( "List after inserting is :")
+           -- putStrLn (showLst $ d)
+           -- putStrLn("List after deleting is :")
+           -- putStrLn (showLst $ smthLetter Delete 2 5 "aaaaaaa" d)
+           -- where a = initList b Nothing
+           --       b = length $ s
+           --       s =  concatList testList
+           --       d = smthLetter Insert 1 5 "abcde" a
+           -- putStrLn (show (getCenter (getCell 1)) )
+           display window background (drawWorld (makeWorld testList))
         
         
         
