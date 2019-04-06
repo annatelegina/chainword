@@ -20,6 +20,7 @@ data World = World
     , marker :: Int
     , colour_marker :: Color
     , colour_letter :: Color
+    , colour_number :: Color
     }
 tmpField = [ (a, 1)| a <-[8,7..1]] ++ [(b, 2) |b <-[1,2..8]] ++ [ (a, 3)| a <-[8,7..1]] 
            ++ [(b, 4) |b <-[1,2..8]] ++ [ (a, 5)| a <-[8,7..1]] ++ [(b, 6) |b <-[1,2..8]] 
@@ -35,7 +36,7 @@ getCell :: Int -> (Int, Int)
 getCell n = tmpField!!(n-1)
 
 getCorner :: (Int, Int) -> (Float, Float)
-getCorner (x, y) = (fst s+10, snd s-2*l-10)
+getCorner (x, y) = (fst s, snd s-2*l)
                    where s = position (x-1, y-1)
                          l = fromIntegral(div cellSize 2)
 
@@ -48,7 +49,7 @@ position :: (Int, Int) -> (Float, Float)
 position (x, y) = (fromIntegral(- div sizeWin 2 + y*cellSize), fromIntegral(div (sizeWin+heiOffset) 2 - x*cellSize))
 
 makeWorld :: [String] -> World
-makeWorld x = World (replicate (cellDim*cellDim) Nothing) (concatList 1 x) 1 green black
+makeWorld x = World (replicate (cellDim*cellDim) Nothing) (concatList 1 x) 1 green black red
 
 drawMarker:: Int -> Picture
 drawMarker n = translate (fst cord) (snd cord) $ color green $ rectangleSolid size size
@@ -57,12 +58,20 @@ drawMarker n = translate (fst cord) (snd cord) $ color green $ rectangleSolid si
                      cord = getCenter (getCell n) 
 	   
 drawWorld :: World -> Picture
-drawWorld (World x y num colour lett) = (base<>marker<>words)
+drawWorld (World x y num colour lett numcol) = (base<>marker<>words<>numbers)
                                 where
                                      base = (makeVertical cellDim) <> (makeHorizontal cellDim) <> chainLines
                                      marker = drawMarker num
                                      words = mconcat [color lett $ translate (fst $ getCenter (getCell n)) (snd $ getCenter (getCell n)) $ scale 0.2 0.2 $ Text $ show ch | n<- [1..length x], Just ch <- [x!!(n-1)]]
+                                     numbers = mconcat [color numcol $ translate (fst $ getCorner (getCell n)) (snd $ getCorner (getCell  n)) $ scale 0.1 0.1 $ Text $ show k | n<- [1..length cell], Just k<- [cell!!(n-1)] ]
+                                     cell = getNum y
 
+
+
+getNum :: [Letter] -> [Maybe Int]
+getNum [] = []
+getNum (Letter a (Just n):xs) = [Just n] <> getNum xs
+getNum (Letter a Nothing:xs) = [Nothing] <> getNum xs
 --functions for the chain of char symbols
 ----last elem of the list
 lastList :: [a] -> a
@@ -174,7 +183,7 @@ drawing = pictures
 
 
 testList = ["anna", "apple", "enabl", "look"] :: [String]
-test1 = ["teleging", "gnomes", "separate", "equal", "looking"] ::[String]
+test1 = ["teleging", "gnomes", "separate", "equal", "looking"] :: [String]
 
 runMyProj :: IO ()
 runMyProj = do
@@ -191,7 +200,7 @@ runMyProj = do
                    -- s =  concatList 1 test1
                    -- d = smthLetter Insert 1 5 "abcde" a
            -- putStrLn (show (getCenter (getCell 1)) )
-           display window background (drawWorld (makeWorld testList))
+           display window background (drawWorld (makeWorld test1))
         
         
         
