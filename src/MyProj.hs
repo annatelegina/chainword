@@ -9,7 +9,7 @@ centPos  = 100 :: Int
 
 data Letter = Letter
     { symb :: Char
-    , border :: Bool
+    , border :: Maybe Int
     }
 data Action = Insert | Delete
 data GameState = Error | Ok 
@@ -48,7 +48,7 @@ position :: (Int, Int) -> (Float, Float)
 position (x, y) = (fromIntegral(- div sizeWin 2 + y*cellSize), fromIntegral(div (sizeWin+heiOffset) 2 - x*cellSize))
 
 makeWorld :: [String] -> World
-makeWorld x = World (replicate (cellDim*cellDim) (Just 'A') ) (concatList x) 1 green black
+makeWorld x = World (replicate (cellDim*cellDim) Nothing) (concatList 1 x) 1 green black
 
 drawMarker:: Int -> Picture
 drawMarker n = translate (fst cord) (snd cord) $ color green $ rectangleSolid size size
@@ -57,12 +57,11 @@ drawMarker n = translate (fst cord) (snd cord) $ color green $ rectangleSolid si
                      cord = getCenter (getCell n) 
 	   
 drawWorld :: World -> Picture
-drawWorld (World x y num colour lett) = (base<>marker<>words<>numbers)
+drawWorld (World x y num colour lett) = (base<>marker<>words)
                                 where
                                      base = (makeVertical cellDim) <> (makeHorizontal cellDim) <> chainLines
                                      marker = drawMarker num
                                      words = mconcat [color lett $ translate (fst $ getCenter (getCell n)) (snd $ getCenter (getCell n)) $ scale 0.2 0.2 $ Text $ show ch | n<- [1..length x], Just ch <- [x!!(n-1)]]
-                                     
 
 --functions for the chain of char symbols
 ----last elem of the list
@@ -80,13 +79,19 @@ isCorrect (x:xs) = lastOne == firstTwo && isCorrect xs
         firstTwo = head (head xs)
 
 --doing the chain of chars for chainword
-concatList :: [String] -> [Letter]
-concatList [x] = makeChain x
-concatList (x:xs) =  makeChain x ++ (tail $ concatList xs)
+concatList :: Int -> [String] -> [Letter]
+concatList n [x] = makeChain (Just n) x ++ (getLastLetter x)
+concatList n (x:xs) =  makeChain (Just n) x ++ (concatList (n+1) xs)
 
-makeChain :: [Char] -> [Letter]
-makeChain  [x] = [Letter x True]
-makeChain  (x:xs) = (Letter x False) : makeChain xs
+makeChain :: Maybe Int -> [Char] -> [Letter]
+makeChain Nothing [x] = []
+makeChain (Just n) [x] = [Letter x (Just n)]
+makeChain Nothing (x:xs) = (Letter x Nothing) : makeChain Nothing xs
+makeChain (Just n) (x:xs) = (Letter x (Just n)) : makeChain Nothing xs
+
+getLastLetter :: [Char] -> [Letter]
+getLastLetter [x] = [Letter x Nothing]
+getLastLetter (x:xs) = getLastLetter xs
 
 --util for printing letters
 showLetter :: [Letter] -> String
@@ -169,22 +174,22 @@ drawing = pictures
 
 
 testList = ["anna", "apple", "enabl", "look"] :: [String]
-
+test1 = ["teleging", "gnomes", "separate", "equal", "looking"] ::[String]
 
 runMyProj :: IO ()
 runMyProj = do
-           -- putStrLn ("Correct answer list is:")
-           -- putStrLn( showLetter $ s)
-           -- putStrLn ("Our answer list is :")
-           -- putStrLn (showLst $ a)
-           -- putStrLn( "List after inserting is :")
-           -- putStrLn (showLst $ d)
-           -- putStrLn("List after deleting is :")
-           -- putStrLn (showLst $ smthLetter Delete 2 5 "aaaaaaa" d)
-           -- where a = initList b Nothing
-           --       b = length $ s
-           --       s =  concatList testList
-           --       d = smthLetter Insert 1 5 "abcde" a
+            --  putStrLn ("Correct answer list is:")
+            --  putStrLn( showLetter $ s)
+            --  putStrLn ("Our answer list is :")
+            --  putStrLn (showLst $ a)
+            --  putStrLn( "List after inserting is :")
+            --  putStrLn (showLst $ d)
+            --  putStrLn("List after deleting is :")
+            --  putStrLn (showLst $ smthLetter Delete 2 5 "aaaaaaa" d)
+            --  where --a = initList b Nothing
+              --      b = length $ s
+                   -- s =  concatList 1 test1
+                   -- d = smthLetter Insert 1 5 "abcde" a
            -- putStrLn (show (getCenter (getCell 1)) )
            display window background (drawWorld (makeWorld testList))
         
