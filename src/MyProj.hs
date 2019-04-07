@@ -18,6 +18,7 @@ data GameState = Error | Ok
 data World = World
     { field :: [Maybe Char]
     , answers :: [Letter]
+    --, final :: String
     , marker :: Int
     , colour_marker :: Color
     , colour_letter :: Color
@@ -127,13 +128,11 @@ showLst (Just x : xs) = "Char" ++(show x) ++ "\n" ++ showLst xs
 showLst (Nothing : xs) = "Nothing" ++ "\n"++ showLst xs
 
 --action for insert/delete symbols in the chain
-smthLetter :: Action -> Int -> Int -> String -> [Maybe Char] -> [Maybe Char]
-smthLetter Delete 0 0 _ x = x
-smthLetter Delete 0 m s (x:xs) = Nothing : smthLetter Delete 0 (m-1) s xs
-smthLetter Delete n m s (x:xs) = x : smthLetter Delete (n-1) m s xs
-smthLetter Insert 0 0 _ x = x
-smthLetter Insert 0 m (s:ss) (x:xs) = Just s : smthLetter Insert 0 (m-1) ss xs
-smthLetter Insert n m s (x:xs) = x : smthLetter Insert (n-1) m s xs
+smthLetter :: Action -> Int  -> Char -> [Maybe Char] -> [Maybe Char]
+smthLetter Delete 1 _ (x:xs) = Nothing : xs
+smthLetter Delete n s (x:xs) = x : smthLetter Delete (n-1) s xs
+smthLetter Insert 1 s (x:xs) = Just s : xs
+smthLetter Insert n s (x:xs) = x : smthLetter Insert (n-1) s xs
 
 
 --checking our input results
@@ -144,6 +143,14 @@ checkRight :: (Eq a) => [a]->[Maybe a] -> Int
 checkRight [] _ = 0
 checkRight (x:xs) (Nothing : ys) = checkRight xs ys
 checkRight (x:xs) (y:ys) = if x ==  (fromJust y) then (1 + checkRight xs ys)  else checkRight xs ys
+
+
+endOfGame :: [Maybe Char] -> [Letter] -> String
+endOfGame [] _ = "Well done!\n"
+endOfGame (Nothing:xs) _ = "You have empty cells\n"
+endOfGame (x:xs) ((Letter ans num):ys) 
+                                | (fromJust x) == ans = endOfGame xs ys
+                                | otherwise = "You have mistakes!\n"
 
 --initialize the chain--------------------------------------------------------
 initList :: Int -> a -> [a]
@@ -230,13 +237,26 @@ handleEvent (EventKey (SpecialKey KeyDown) Down _ _) (World x y num colour lett 
                                                                                     n = fst point
                                                                                     newNum = getMarker (fst point + 1, snd point)
                                                                                     point = getCell num
+handleEvent (EventKey (Char sym) Down _ _) (World x y num colour lett numcol) = World newAns y num colour lett numcol
+                                                                       where
+                                                                           newAns = smthLetter Insert num sym x
+handleEvent (EventKey (SpecialKey KeyBackspace) Down _ _) (World x y num colour lett numcol) = World newAns y num colour lett numcol
+                                                                       where
+                                                                           newAns = smthLetter Delete num 'a' x
 handleEvent _ w = w
 
 --handleEvent (EventKey (Char key) Up _ _) (World x y num colour lett numcol) = 
 
+update :: Float -> World -> World
+update _ = id
+
 
 testList = ["anna", "apple", "enabl", "look"] :: [String]
 test1 = ["teleging", "gnomes", "separate", "equal", "looking"] :: [String]
+
+stepsPerSecond :: Int
+stepsPerSecond = 60
+
 
 runMyProj :: IO ()
 runMyProj = do
@@ -253,8 +273,9 @@ runMyProj = do
                    -- s =  concatList 1 test1
                    -- d = smthLetter Insert 1 5 "abcde" a
            -- putStrLn (show (getCenter (getCell 1)) )
-           let initState = World 
-           display window background (drawWorld (makeWorld test1))
+           let initState = makeWorld test1
+           play window background stepsPerSecond initState drawWorld handleEvent update
+           --play display window background (drawWorld initState) handleEvent update
            --play display bgColor stepsPerSecond initState drawWorld handleEvent update
         
         
