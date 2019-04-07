@@ -237,12 +237,12 @@ handleEvent (EventKey (SpecialKey KeyDown) Down _ _) (World x y num colour lett 
                                                                                     n = fst point
                                                                                     newNum = getMarker (fst point + 1, snd point)
                                                                                     point = getCell num
+handleEvent (EventKey (SpecialKey KeySpace) Down _ _) (World x y num colour lett numcol) = World newAns y num colour lett numcol
+                                                                       where
+                                                                           newAns = smthLetter Delete num 'a' x
 handleEvent (EventKey (Char sym) Down _ _) (World x y num colour lett numcol) = World newAns y num colour lett numcol
                                                                        where
                                                                            newAns = smthLetter Insert num sym x
-handleEvent (EventKey (SpecialKey KeyBackspace) Down _ _) (World x y num colour lett numcol) = World newAns y num colour lett numcol
-                                                                       where
-                                                                           newAns = smthLetter Delete num 'a' x
 handleEvent _ w = w
 
 --handleEvent (EventKey (Char key) Up _ _) (World x y num colour lett numcol) = 
