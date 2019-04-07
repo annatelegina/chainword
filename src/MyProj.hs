@@ -4,6 +4,7 @@ module MyProj
 
 import Graphics.Gloss
 import Prelude
+import Graphics.Gloss.Interface.Pure.Game
 sizeWin = 560 :: Int
 centPos  = 100 :: Int
 
@@ -34,6 +35,19 @@ heiOffset = 100 :: Int
 
 getCell :: Int -> (Int, Int)
 getCell n = tmpField!!(n-1)
+
+--find the number of Carteg in random list
+
+findCarteg :: (Eq a) => (Eq b) => (a, b) -> [(a,b)] -> Int
+findCarteg (m,n) (x:xs) = if (m == fst x) && (n == snd x) then 1 else (1 + findCarteg (m,n) xs)
+findCarteg _ [] = 0
+
+--the opposite to getCell
+getMarker :: (Int, Int) -> Int 
+getMarker (m,n) = findCarteg (m,n) tmpField
+
+
+
 
 getCorner :: (Int, Int) -> (Float, Float)
 getCorner (x, y) = (fst s, snd s-2*l)
@@ -182,6 +196,45 @@ drawing = pictures
 -----------------------------------------------
 
 
+--playing game
+handleEvent :: Event -> World -> World
+
+handleEvent (EventKey (SpecialKey KeyEnter) Down _ _) (World x y num colour lett numcol) = World x y num colour lett numcol
+                              
+handleEvent (EventKey (SpecialKey KeyRight) Down _ _) (World x y num colour lett numcol) 
+                                                                                | n < 8 = World x y newNum colour lett numcol 
+                                                                                | otherwise = World x y num colour lett numcol      
+                                                                                where 
+                                                                                    n = snd point
+                                                                                    newNum = getMarker (fst point, snd point  + 1)
+                                                                                    point = getCell num  
+    
+handleEvent (EventKey (SpecialKey KeyLeft) Down _ _) (World x y num colour lett numcol) 
+                                                                                | n > 1 = World x y newNum colour lett numcol 
+                                                                                | otherwise = World x y num colour lett numcol      
+                                                                                where 
+                                                                                    n = snd point
+                                                                                    newNum = getMarker (fst point, snd point  - 1)
+                                                                                    point = getCell num 
+handleEvent (EventKey (SpecialKey KeyUp) Down _ _) (World x y num colour lett numcol) 
+                                                                                | n > 1 = World x y newNum colour lett numcol 
+                                                                                | otherwise = World x y num colour lett numcol      
+                                                                                where 
+                                                                                    n = fst point
+                                                                                    newNum = getMarker (fst point - 1, snd point)
+                                                                                    point = getCell num 
+handleEvent (EventKey (SpecialKey KeyDown) Down _ _) (World x y num colour lett numcol) 
+                                                                                | n < 8 = World x y newNum colour lett numcol 
+                                                                                | otherwise = World x y num colour lett numcol      
+                                                                                where 
+                                                                                    n = fst point
+                                                                                    newNum = getMarker (fst point + 1, snd point)
+                                                                                    point = getCell num
+handleEvent _ w = w
+
+--handleEvent (EventKey (Char key) Up _ _) (World x y num colour lett numcol) = 
+
+
 testList = ["anna", "apple", "enabl", "look"] :: [String]
 test1 = ["teleging", "gnomes", "separate", "equal", "looking"] :: [String]
 
@@ -200,7 +253,9 @@ runMyProj = do
                    -- s =  concatList 1 test1
                    -- d = smthLetter Insert 1 5 "abcde" a
            -- putStrLn (show (getCenter (getCell 1)) )
+           let initState = World 
            display window background (drawWorld (makeWorld test1))
+           --play display bgColor stepsPerSecond initState drawWorld handleEvent update
         
         
         
