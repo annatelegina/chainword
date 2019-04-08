@@ -6,6 +6,7 @@ import Graphics.Gloss
 import Prelude
 import Graphics.Gloss.Interface.Pure.Game
 import System.IO
+
 sizeWin = 560 :: Int
 centPos  = 100 :: Int
 
@@ -13,8 +14,7 @@ data Letter = Letter
     { symb :: Char
     , border :: Maybe Int
     }
-data Action = Insert | Delete
-data GameState = Error | Ok 
+data Action = Insert | Delete 
 
 data World = World
     { field :: [Maybe Char]
@@ -285,26 +285,11 @@ ans = "./test/answers.txt" :: String
 
 runMyProj :: IO ()
 runMyProj = do
-            --  putStrLn ("Correct answer list is:")
-            --  putStrLn( showLetter $ s)
-            --  putStrLn ("Our answer list is :")
-            --  putStrLn (showLst $ a)
-            --  putStrLn( "List after inserting is :")
-            --  putStrLn (showLst $ d)
-            --  putStrLn("List after deleting is :")
-            --  putStrLn (showLst $ smthLetter Delete 2 5 "aaaaaaa" d)
-            --  where --a = initList b Nothing
-              --      b = length $ s
-                   -- s =  concatList 1 test1
-                   -- d = smthLetter Insert 1 5 "abcde" a
-           -- putStrLn (show (getCenter (getCell 1)) )
            s <- readFile quest
            putStrLn s
            b <- readFile ans
            let initState = makeWorld $ parseInput b
            play window background stepsPerSecond initState drawWorld handleEvent update
-           --play display window background (drawWorld initState) handleEvent update
-           --play display bgColor stepsPerSecond initState drawWorld handleEvent update
         
         
         

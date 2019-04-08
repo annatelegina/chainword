@@ -1,10 +1,12 @@
-Japanese vodka
-School and university in one word
-Not positive
-Big animal in the zoo
-10 hundred
-Starting word in every letter
-Asking for something
-Lightweight process in Unix
-Not safe
-Gold decoration on the finger
+1) Japanese vodka
+2) School and university in one word
+3) Not positive
+4) Big animal in the zoo
+5) 10 hundred
+6) Starting word in every letter
+7) Asking for something
+8) Lightweight process in Unix
+9) Not safe
+10) Gold decoration on the finger
+11) Snow White girl and 7 ...
+12) Some kind of ability
