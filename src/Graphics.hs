@@ -72,7 +72,7 @@ position (x, y) = (fromIntegral(- div sizeWin 2 + y*cellSize), fromIntegral(div 
 
 --------text for end the game----------------------------
 endOfGame :: [Maybe Char] -> [Letter] -> String
-endOfGame [] _ = "Well done!\n"
+endOfGame [] _ = "Completed!\n"
 endOfGame (Nothing:xs) _ = "You have empty cells\n"
 endOfGame (x:xs) ((Letter ans num):ys) 
                                 | (fromJust x) == ans = endOfGame xs ys

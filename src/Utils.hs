@@ -33,6 +33,11 @@ isCorrect (x:xs) = lastOne == firstTwo && isCorrect xs
         lastOne = lastList x
         firstTwo = head (head xs)
 
+allRight :: [Maybe Char] -> [Letter] -> Bool
+allRight [] [] = True
+allRight (Just k :xs) ((Letter sym bor):ys) | k == sym = allRight xs ys
+allRight _ _ = False
+
 -------utils for printing letters---------------------
 ------------------------------------------------------
 showLetter :: [Letter] -> String
@@ -54,8 +59,8 @@ find xs e
     | otherwise = length xs 
     where 
         ffind (x:xs) e
-                | x == e    = 0
-                | otherwise     = 1 + ffind xs e
+                | x == e = 0
+                | otherwise = 1 + ffind xs e
 
 checkEnd :: (Eq a) => [Maybe a] -> Bool
 checkEnd [] = True

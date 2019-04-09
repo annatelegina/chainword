@@ -14,6 +14,7 @@ handleEvent :: Event -> World -> World
 handleEvent (EventKey (SpecialKey KeyEnter) Down _ _) (World x y num colour lett numcol 0)| (checkEnd x) == False = World x y num colour lett numcol 1
                                                                                           | otherwise = World x y num colour lett numcol 2
 handleEvent (EventKey (SpecialKey KeyEnter) Down _ _) (World x y num colour lett numcol 1) = World x y num colour lett numcol 0
+handleEvent (EventKey (SpecialKey KeyEnter) Down _ _) (World x y num colour lett numcol 2)| (allRight x y) == False = World x y num colour lett numcol 0
 handleEvent (EventKey (SpecialKey KeyRight) Down _ _) (World x y num colour lett numcol fin) 
                                                                                 | n < 8 = World x y newNum colour lett numcol fin
                                                                                 | otherwise = World x y num colour lett numcol fin
