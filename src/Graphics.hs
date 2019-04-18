@@ -38,15 +38,17 @@ chainLines = mconcat [color (dark black) (line [(lineCoord n, lineCoordh 0), (li
 -----------------------------------------------------------------------------
 	   
 drawWorld :: World -> Picture
-drawWorld (World x y num colour lett numcol 0)  = (base<>marker<>words<>numbers)
+drawWorld (World x y a num colour lett numcol t 0) | t > mTime = scale 0.15 0.15 $ color red $ Text "YOUR TIME IS UP!!!"
+drawWorld (World x y a num colour lett numcol t 0)  = (base<>marker<>words<>numbers<>timer)
                                                     where
                                                     base = (makeVertical cellDim) <> (makeHorizontal cellDim) <> chainLines
                                                     marker = drawMarker num
                                                     words = mconcat [color lett $ translate (fst $ getCenter (getCell n)) (snd $ getCenter (getCell n)) $ scale 0.2 0.2 $ Text $ [ch] | n<- [1..length x], Just ch <- [x!!(n-1)]]
                                                     numbers = mconcat [color numcol $ translate (fst $ getCorner (getCell n)) (snd $ getCorner (getCell  n)) $ scale 0.1 0.1 $ Text $ show k | n<- [1..length cell], Just k<- [cell!!(n-1)] ]
                                                     cell = getNum y
-drawWorld (World x y num colour lett numcol 1) = scale 0.15 0.15 $ color red $ Text $ endOfGame x y
-drawWorld (World x y num colour lett numcol 2) = scale 0.15 0.15 $ color red $ Text $ endOfGame x y
+                                                    timer = color numcol $ translate 0 (-250) $ scale 0.1 0.1 $ Text $ (show "Seconds to play: ") ++  (show (truncate (mTime-t)))
+drawWorld (World x y a num colour lett numcol t 1) = scale 0.15 0.15 $ color red $ Text $ endOfGame x y
+drawWorld (World x y a num colour lett numcol t 2) = scale 0.15 0.15 $ color red $ Text $ endOfGame x y
 
 -----functions for getting coordinates---------------------------
 -----------------------------------------------------------------
@@ -71,12 +73,14 @@ position (x, y) = (fromIntegral(- div sizeWin 2 + y*cellSize), fromIntegral(div 
 
 
 --------text for end the game----------------------------
+
 endOfGame :: [Maybe Char] -> [Letter] -> String
 endOfGame [] _ = "Completed!\n"
 endOfGame (Nothing:xs) _ = "You have empty cells\n"
 endOfGame (x:xs) ((Letter ans num):ys) 
                                 | (fromJust x) == ans = endOfGame xs ys
                                 | otherwise = "You have mistakes!\n"
+
 
 --returns the coordinate of the line            
 lineCoord :: Int -> Float

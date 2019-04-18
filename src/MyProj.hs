@@ -16,7 +16,7 @@ import Handler
 ---------initialize the game world-------------------------------------------
 -----------------------------------------------------------------------------
 makeWorld :: [String] -> World
-makeWorld x = World (replicate (cellDim*cellDim) Nothing) (concatList 1 x) 1 green black red 0
+makeWorld x = World (replicate (cellDim*cellDim) Nothing) (concatList 1 x) x 1 green black red 0.0 0
 
 
 -------------making the chain of chars for chainword--------------------------
@@ -46,7 +46,7 @@ initList n x = x : initList (n-1) x
 
 
 update :: Float -> World -> World
-update _ = id
+update _ (World x y a num colour lett numcol t fin) = (World x y a num colour lett numcol (t+1) fin)
 
 parseInput:: String -> [String]
 parseInput s
@@ -59,7 +59,7 @@ runMyProj = do
            putStrLn s
            b <- readFile ans
            let initState = makeWorld $ parseInput b
-           play window background stepsPerSecond initState drawWorld handleEvent update
+           play window background stepsPerSecond initState drawWorld handleEvent update 
         
         
         

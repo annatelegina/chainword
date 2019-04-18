@@ -11,6 +11,9 @@ cellSize :: Int
 cellSize = div sizeWin cellDim
 heiOffset = 100 :: Int
 
+--constant for timer
+mTime = 100.0 :: Float
+
 --constants for rendering
 window :: Display
 window = InWindow "Chainword" (sizeWin, sizeWin+heiOffset) (centPos, centPos)
@@ -43,5 +46,5 @@ ans = "./test/answers.txt" :: String
 
 --for timer
 stepsPerSecond :: Int
-stepsPerSecond = 60
+stepsPerSecond = 1
 
