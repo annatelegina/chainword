@@ -42,7 +42,7 @@ drawWorld (World x y num colour lett numcol 0)  = (base<>marker<>words<>numbers)
                                                     where
                                                     base = (makeVertical cellDim) <> (makeHorizontal cellDim) <> chainLines
                                                     marker = drawMarker num
-                                                    words = mconcat [color lett $ translate (fst $ getCenter (getCell n)) (snd $ getCenter (getCell n)) $ scale 0.2 0.2 $ Text $ show ch | n<- [1..length x], Just ch <- [x!!(n-1)]]
+                                                    words = mconcat [color lett $ translate (fst $ getCenter (getCell n)) (snd $ getCenter (getCell n)) $ scale 0.2 0.2 $ Text $ [ch] | n<- [1..length x], Just ch <- [x!!(n-1)]]
                                                     numbers = mconcat [color numcol $ translate (fst $ getCorner (getCell n)) (snd $ getCorner (getCell  n)) $ scale 0.1 0.1 $ Text $ show k | n<- [1..length cell], Just k<- [cell!!(n-1)] ]
                                                     cell = getNum y
 drawWorld (World x y num colour lett numcol 1) = scale 0.15 0.15 $ color red $ Text $ endOfGame x y
