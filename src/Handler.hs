@@ -11,10 +11,11 @@ import Utils
 
 --playing game
 handleEvent :: Event -> World -> World
-handleEvent (EventKey (SpecialKey KeyEnter) Down _ _) (World x y a num colour lett numcol t 0)| (checkEnd x) == False = World x y a num colour lett numcol t 1
+handleEvent (EventKey (SpecialKey KeyEnter) Down _ _) (World x y a num colour lett numcol t 0)| (checkEnd x) == False && (t < mTime ) = World x y a num colour lett numcol t 1
                                                                                           | otherwise = World x y a num colour lett numcol t 2
-handleEvent (EventKey (SpecialKey KeyEnter) Down _ _) (World x y a num colour lett numcol t 1) = World x y a num colour lett numcol t 0
-handleEvent (EventKey (SpecialKey KeyEnter) Down _ _) (World x y a num colour lett numcol t 2)| (allRight x y) == False = World x y a num colour lett numcol t 0
+handleEvent (EventKey (SpecialKey KeyEnter) Down _ _) (World x y a num colour lett numcol t 1) | t > mTime = World x y a num colour lett numcol t 2
+                                                                                               | otherwise =  World x y a num colour lett numcol t 0
+handleEvent (EventKey (SpecialKey KeyEnter) Down _ _) (World x y a num colour lett numcol t 2)| (allRight x y) == False && (t < mTime) = World x y a num colour lett numcol t 0
 handleEvent (EventKey (SpecialKey KeyRight) Down _ _) (World x y a num colour lett numcol t fin) 
                                                                                 | n < 8 = World x y a newNum colour lett numcol t fin
                                                                                 | otherwise = World x y a num colour lett numcol t fin

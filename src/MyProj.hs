@@ -53,6 +53,13 @@ parseInput s
     | null s = [] 
     | otherwise= (take (find s '\n') s): (parseInput (drop ((find s '\n')+1) s))
     
+    
+--test
+testChar = [Just 'a', Nothing, Just 'n', Just 'n', Just 'a', Just 'b', Just 'e', Nothing]
+testLetter = [Letter 'a' (Just 1), Letter 'n' Nothing, Letter 'n' Nothing, Letter 'a' (Just 2), Letter 'b' Nothing, Letter 'e' Nothing, Letter 'b' (Just 3), Letter 'c' Nothing]
+
+
+    
 runMyProj :: IO ()
 runMyProj = do
            s <- readFile quest
@@ -60,7 +67,8 @@ runMyProj = do
            b <- readFile ans
            let initState = makeWorld $ parseInput b
            play window background stepsPerSecond initState drawWorld handleEvent update 
-        
+            -- putStrLn (show(makeWords [] testChar testLetter))
+             
         
         
         

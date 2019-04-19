@@ -66,8 +66,6 @@ checkEnd :: (Eq a) => [Maybe a] -> Bool
 checkEnd [] = True
 checkEnd (Nothing : xs) = False
 checkEnd (x : xs) = checkEnd xs
---for checking the end
-
 
 
 

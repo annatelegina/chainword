@@ -12,7 +12,7 @@ cellSize = div sizeWin cellDim
 heiOffset = 100 :: Int
 
 --constant for timer
-mTime = 100.0 :: Float
+mTime = 10.0 :: Float
 
 --constants for rendering
 window :: Display
