@@ -11,6 +11,7 @@ import Utils
 
 --playing game
 handleEvent :: Event -> World -> World
+handleEvent _ (World x y a num colour lett numcol t p) | t > mTime = World x y a num colour lett numcol t 2
 handleEvent (EventKey (SpecialKey KeyEnter) Down _ _) (World x y a num colour lett numcol t 0)| (checkEnd x) == False && (t < mTime ) = World x y a num colour lett numcol t 1
                                                                                           | otherwise = World x y a num colour lett numcol t 2
 handleEvent (EventKey (SpecialKey KeyEnter) Down _ _) (World x y a num colour lett numcol t 1) | t > mTime = World x y a num colour lett numcol t 2

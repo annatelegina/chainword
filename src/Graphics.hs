@@ -38,7 +38,10 @@ chainLines = mconcat [color (dark black) (line [(lineCoord n, lineCoordh 0), (li
 -----------------------------------------------------------------------------
 	   
 drawWorld :: World -> Picture
-drawWorld (World x y a num colour lett numcol t 0) | t > mTime = scale 0.15 0.15 $ color red $ Text ("YOUR TIME IS UP!!!" ++ (ending x y a)) 
+drawWorld (World x y a num colour lett numcol t 0) | t > mTime =(head<>words)
+                                                               where
+                                                               head = color red $ translate (-50) 240 $ scale 0.15 0.15 $ Text "YOUR TIME IS UP!" 
+                                                               words = mconcat[color red $ translate (-50) (200-20*fromIntegral(n)) $ scale 0.15 0.15 $ Text $ l |n<-[0..length (ending x y a)-1], l<-[(ending x y a)!!n]]
 drawWorld (World x y a num colour lett numcol t 0)  = (base<>marker<>words<>numbers<>timer)
                                                     where
                                                     base = (makeVertical cellDim) <> (makeHorizontal cellDim) <> chainLines
@@ -47,8 +50,14 @@ drawWorld (World x y a num colour lett numcol t 0)  = (base<>marker<>words<>numb
                                                     numbers = mconcat [color numcol $ translate (fst $ getCorner (getCell n)) (snd $ getCorner (getCell  n)) $ scale 0.1 0.1 $ Text $ show k | n<- [1..length cell], Just k<- [cell!!(n-1)] ]
                                                     cell = getNum y
                                                     timer = color numcol $ translate 0 (-250) $ scale 0.1 0.1 $ Text $ (show "Seconds to play: ") ++  (show (truncate (mTime-t)))
-drawWorld (World x y a num colour lett numcol t 1) = scale 0.15 0.15 $ color red $ Text $ ending x y a
-drawWorld (World x y a num colour lett numcol t 2) = scale 0.15 0.15 $ color red $ Text $ ending x y a
+drawWorld (World x y a num colour lett numcol t 1) =(pause<>words)
+                                                   where
+                                                   words = mconcat[color red $ translate (-50) (200-20*fromIntegral(n)) $ scale 0.15 0.15 $ Text $ l |n<-[0..length (ending x y a)-1], l<-[(ending x y a)!!n]]
+                                                   pause = color red $ translate (-50) 240 $ scale 0.15 0.15 $ Text "YOU MAY CONTINUE!"  
+drawWorld (World x y a num colour lett numcol t 2) =(end<>words)
+                                                   where
+                                                   words = mconcat[color red $ translate (-50) (200-20*fromIntegral(n)) $ scale 0.15 0.15 $ Text $ l |n<-[0..length (ending x y a)-1], l<-[(ending x y a)!!n]]
+                                                   end = color red $ translate (-50) 240 $ scale 0.15 0.15 $ Text "GAME ENDED!" 
 
 -----functions for getting coordinates---------------------------
 -----------------------------------------------------------------
@@ -73,12 +82,12 @@ position (x, y) = (fromIntegral(- div sizeWin 2 + y*cellSize), fromIntegral(div 
 
 
 --------text for end the game----------------------------
-ending :: [Maybe Char] -> [Letter] -> [String] -> String
+ending :: [Maybe Char] -> [Letter] -> [String] -> [String]
 ending l p answers = finish (makeWords [] l p) answers
 
-finish :: [String] -> [String] -> String
-finish [] [] = "\n"
-finish (x:xs) (y:ys) | x == y = x ++ (show "\n") ++ finish xs ys
+finish :: [String] -> [String] -> [String]
+finish [] [] = []
+finish (x:xs) (y:ys) | x == y = x : finish xs ys
                      | otherwise = finish xs ys
 
 
