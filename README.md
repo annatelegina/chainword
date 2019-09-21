@@ -12,7 +12,7 @@ stack build
 Собрать и запустить проект можно при помощи команды:
 
 ```
-stack build && stack exec my-project
+stack build && stack exec chainword
 ```
 
 Запустить тесты можно при помощи команды:
