@@ -49,7 +49,7 @@ drawWorld (World x y a num colour lett numcol t 0)  = (base<>marker<>words<>numb
                                                     words = mconcat [color lett $ translate (fst $ getCenter (getCell n)) (snd $ getCenter (getCell n)) $ scale 0.2 0.2 $ Text $ [ch] | n<- [1..length x], Just ch <- [x!!(n-1)]]
                                                     numbers = mconcat [color numcol $ translate (fst $ getCorner (getCell n)) (snd $ getCorner (getCell  n)) $ scale 0.1 0.1 $ Text $ show k | n<- [1..length cell], Just k<- [cell!!(n-1)] ]
                                                     cell = getNum y
-                                                    timer = color numcol $ translate 0 (-250) $ scale 0.1 0.1 $ Text $ (show "Seconds to play: ") ++  (show (truncate (mTime-t)))
+                                                    timer = color numcol $ translate 0 (-250) $ scale 0.1 0.1 $ Text $ "Seconds to play: " ++  (show (truncate (mTime-t)))
 drawWorld (World x y a num colour lett numcol t 1) =(pause<>words)
                                                    where
                                                    words = mconcat[color red $ translate (-50) (200-20*fromIntegral(n)) $ scale 0.15 0.15 $ Text $ l |n<-[0..length (ending x y a)-1], l<-[(ending x y a)!!n]]
